@@ -4,12 +4,21 @@ import (
 	"io"
 	"net/http"
 	"tinycache/cache"
+	"tinycache/metrics"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRoutes(c *cache.Cache) *gin.Engine {
+	metrics.Init()
+
 	r := gin.Default()
+	r.Use(metrics.Middleware())
+	r.GET("/metrics", metrics.Handler())
+
+	r.GET("/", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, "I'm alive!")
+	})
 
 	r.POST("/cache/:key", func(ctx *gin.Context) {
 		key := ctx.Param("key")
@@ -41,9 +50,12 @@ func SetupRoutes(c *cache.Cache) *gin.Engine {
 		ctx.Status(http.StatusNoContent)
 	})
 
-	r.GET("/cache", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, c.ReadAllEntries())
-
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(404, gin.H{
+			"error":  "route not found",
+			"path":   c.Request.URL.Path,
+			"method": c.Request.Method,
+		})
 	})
 
 	return r
