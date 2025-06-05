@@ -1,0 +1,50 @@
+{
+    "id": null,
+    "uid": "tinycache-dashboard",
+    "title": "TinyCache Dashboard",
+    "timezone": "browser",
+    "schemaVersion": 36,
+    "version": 1,
+    "refresh": "5s",
+    "panels": [
+        {
+            "type": "graph",
+            "title": "HTTP Requests Total",
+            "id": 1,
+            "datasource": "Prometheus",
+            "targets": [
+                {
+                    "expr": "sum by (method, path, status) (http_requests_total)",
+                    "legendFormat": "{{method}} {{path}} → {{status}}",
+                    "refId": "A"
+                }
+            ],
+            "lines": true,
+            "linewidth": 2,
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "type": "stat",
+            "title": "Total Requests",
+            "id": 2,
+            "datasource": "Prometheus",
+            "targets": [
+                {
+                    "expr": "sum(http_requests_total)",
+                    "refId": "B"
+                }
+            ],
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 0,
+                "y": 8
+            }
+        }
+    ]
+}
